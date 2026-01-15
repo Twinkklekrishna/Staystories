@@ -235,12 +235,12 @@ export const initializeDatabase = () => {
 
 // Memory CRUD operations
 export const memory = {
-  create: (data: { id: string; user: string; text: string; date: string }) => {
+  create: (data: { id: string; user: string; text: string; date: string; user_id?: string }) => {
     const db = getDb();
     const stmt = db.prepare(
-      'INSERT INTO memories (id, user, text, date) VALUES (?, ?, ?, ?)'
+      'INSERT INTO memories (id, user_id, user, text, date) VALUES (?, ?, ?, ?, ?)'
     );
-    stmt.run(data.id, data.user, data.text, data.date);
+    stmt.run(data.id, data.user_id || null, data.user, data.text, data.date);
     return data;
   },
   getAll: (user?: string) => {
@@ -287,12 +287,37 @@ export const stay = {
     const db = getDb();
     const stmt = db.prepare('SELECT * FROM stays ORDER BY created_at DESC');
     const rows = stmt.all() as any[];
-    return rows.map(row => ({
-      ...row,
-      amenities: JSON.parse(row.amenities || '[]'),
-      tags: JSON.parse(row.tags || '{}'),
-      isAvailable: row.isAvailable === 1
-    }));
+    return rows.map(row => {
+      let amenities = [];
+      let tags = {};
+      
+      if (typeof row.amenities === 'string') {
+        try {
+          amenities = JSON.parse(row.amenities);
+        } catch (e) {
+          amenities = [];
+        }
+      } else if (Array.isArray(row.amenities)) {
+        amenities = row.amenities;
+      }
+      
+      if (typeof row.tags === 'string') {
+        try {
+          tags = JSON.parse(row.tags);
+        } catch (e) {
+          tags = {};
+        }
+      } else if (typeof row.tags === 'object' && row.tags !== null) {
+        tags = row.tags;
+      }
+      
+      return {
+        ...row,
+        amenities,
+        tags,
+        isAvailable: row.isAvailable === 1
+      };
+    });
   },
   getById: (id: string) => {
     const db = getDb();
@@ -316,7 +341,7 @@ export const stay = {
       data.description,
       data.priceRange,
       data.experience,
-      JSON.stringify(data.amenities || []),
+      typeof data.amenities === 'string' ? data.amenities : JSON.stringify(data.amenities || []),
       data.isAvailable ? 1 : 0,
       id
     );
