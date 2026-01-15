@@ -319,6 +319,7 @@ const DiscoverPage: React.FC = () => {
 
 // --- Stay Details Page ---
 const StayDetailsPage: React.FC = () => {
+  //test
   const { id } = useParams();
   const [stay, setStay] = useState<Stay | null>(null);
   const [nearby, setNearby] = useState<NearbyPlace[]>([]);
