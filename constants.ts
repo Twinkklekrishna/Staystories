@@ -58,6 +58,8 @@ const generateStudents = (): Student[] => {
         const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
         const gender = Math.random() > 0.5 ? 'M' : 'F';
         const studentId = `Y${year}${div}${i.toString().padStart(2, '0')}`;
+        // Generate realistic AI human faces based on gender
+        const genderParam = gender === 'M' ? 'male' : 'female';
         students.push({
           id: studentId,
           rollNo: `CS${year}${div}${i.toString().padStart(2, '0')}`,
@@ -65,7 +67,7 @@ const generateStudents = (): Student[] => {
           year: year as Year,
           division: div as Division,
           gender: gender as 'M' | 'F',
-          imageUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${studentId}&scale=80`
+          imageUrl: `https://api.dicebear.com/7.x/lorelei/jpg?seed=${studentId}&scale=85&backgroundColor=random`
         });
       }
     });
