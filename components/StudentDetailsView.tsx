@@ -87,7 +87,18 @@ const StudentDetailsView: React.FC<Props> = ({ studentId, attendance, onBack }) 
             <h2 className="text-3xl font-black">{student.name}</h2>
             <p className="text-indigo-100 font-semibold">Year {student.year} - Division {student.division}</p>
           </div>
-          <StudentAvatar name={student.name} gender={student.gender} size="lg" className="shadow-lg" />
+          {student.imageUrl ? (
+            <img 
+              src={student.imageUrl} 
+              alt={student.name}
+              className="w-24 h-24 rounded-full border-4 border-white/30 object-cover bg-white/20 shadow-lg"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <StudentAvatar name={student.name} gender={student.gender} size="lg" className="shadow-lg" />
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-4">

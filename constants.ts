@@ -57,13 +57,15 @@ const generateStudents = (): Student[] => {
         const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
         const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
         const gender = Math.random() > 0.5 ? 'M' : 'F';
+        const studentId = `Y${year}${div}${i.toString().padStart(2, '0')}`;
         students.push({
-          id: `Y${year}${div}${i.toString().padStart(2, '0')}`,
+          id: studentId,
           rollNo: `CS${year}${div}${i.toString().padStart(2, '0')}`,
           name: `${fName} ${lName}`,
           year: year as Year,
           division: div as Division,
-          gender: gender as 'M' | 'F'
+          gender: gender as 'M' | 'F',
+          imageUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${studentId}&scale=80`
         });
       }
     });

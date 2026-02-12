@@ -62,6 +62,7 @@ export interface Student {
   year: Year;
   division: Division;
   gender?: Gender;
+  imageUrl?: string;
 }
 
 export interface AttendanceRecord {
