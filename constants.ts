@@ -46,6 +46,10 @@ export const SUBJECTS: Subject[] = [
 const firstNames = ["Rahul", "Anjali", "Midhun", "Sruthi", "Abhijith", "Meera", "Vaisakh", "Sneha", "Kiran", "Arya", "Arjun", "Lakshmi", "Nithin", "Devika", "Rohit", "Gautham", "Sreejith", "Aparna", "Varun", "Parvathy"];
 const lastNames = ["Nair", "Menon", "Pillai", "Kurian", "Warrier", "Nambiar", "George", "Varghese", "Joseph", "Mathew", "Antony", "Thomas", "Paul", "Sebastian", "Eapen"];
 
+// Separate male and female names for proper gender assignment
+const maleNames = ["Rahul", "Midhun", "Abhijith", "Vaisakh", "Kiran", "Arjun", "Nithin", "Rohit", "Gautham", "Sreejith", "Varun"];
+const femaleNames = ["Anjali", "Sruthi", "Meera", "Sneha", "Arya", "Lakshmi", "Devika", "Aparna", "Parvathy"];
+
 const generateStudents = (): Student[] => {
   const students: Student[] = [];
   const years: Year[] = [1, 2, 3, 4];
@@ -54,16 +58,17 @@ const generateStudents = (): Student[] => {
   years.forEach(year => {
     divisions.forEach(div => {
       for (let i = 1; i <= 65; i++) {
+        // Randomly select from combined list, then determine gender from the name
         const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
         const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        const studentId = `Y${year}${div}${i.toString().padStart(2, '0')}`;
         
-        // Determine gender deterministically from student ID for consistent photo/gender matching
-        const idNumeric = parseInt(studentId.replace(/\D/g, ''));
-        const gender = (idNumeric % 2 === 0) ? 'M' : 'F';
+        // Determine gender based on first name
+        const gender = femaleNames.includes(fName) ? 'F' : 'M';
+        const studentId = `Y${year}${div}${i.toString().padStart(2, '0')}`;
         
         // Use realistic stock photos from randomuser.me
         const genderPath = gender === 'M' ? 'men' : 'women';
+        const idNumeric = parseInt(studentId.replace(/\D/g, ''));
         const photoIndex = (idNumeric % 70) + 1;
         
         students.push({
