@@ -2,13 +2,23 @@
 
 // Dynamically construct API URL based on current host
 const getAPIUrl = () => {
-  // If running on development server with specific network IP
-  if (window.location.hostname === '155.155.0.121' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    // Replace the port with 5000 (backend port)
+  // On Vercel (production), use relative path to /api
+  if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+    return '/api';
+  }
+  
+  // On localhost development
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return `http://${window.location.hostname}:5000/api`;
   }
-  // Default fallback
-  return process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  
+  // On specific network IP (like 155.155.0.121)
+  if (window.location.hostname === '155.155.0.121') {
+    return `http://${window.location.hostname}:5000/api`;
+  }
+  
+  // Fallback to relative /api
+  return '/api';
 };
 
 const API_URL = getAPIUrl();

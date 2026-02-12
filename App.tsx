@@ -846,8 +846,28 @@ const App: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Test if backend is available
-        const healthCheck = await fetch('http://localhost:5000/api/health').catch(() => null);
+        // Function to fetch with timeout
+        const fetchWithTimeout = (url: string, timeout = 3000) => {
+          return Promise.race([
+            fetch(url),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('timeout')), timeout)
+            )
+          ]);
+        };
+
+        // Test if backend is available - try Vercel API first, then localhost
+        let healthCheck = null;
+        
+        // On Vercel, try the /api endpoint
+        if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+          healthCheck = await fetchWithTimeout('/api/health', 2000).catch(() => null);
+        }
+        
+        // If running locally or Vercel failed, try localhost
+        if (!healthCheck?.ok && window.location.hostname.includes('localhost')) {
+          healthCheck = await fetchWithTimeout('http://localhost:5000/api/health', 2000).catch(() => null);
+        }
         
         if (healthCheck?.ok) {
           setUseBackend(true);
