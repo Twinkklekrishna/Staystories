@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Deployment Guide
 
 This guide covers deploying the Stay Stories app (frontend + backend) to production.
@@ -115,3 +116,79 @@ If you prefer a unified deployment, containerize and push both to a registry (Do
 ## Support
 
 For questions or issues with deployment, check the README.md or open an issue on GitHub.
+=======
+# 🚀 Deployment Guide: Vercel (Frontend) + Railway (Backend)
+
+## Step 1: Create GitHub Account & Upload Code
+
+1. Go to [github.com](https://github.com) and create an account (free)
+2. Create a new repository named `sahrdaya-attendance-pro`
+3. Open terminal in project folder and run:
+
+```bash
+cd D:\Downloads\sahrdaya-attendance-pro
+git add .
+git commit -m "Initial commit: Attendance app"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/sahrdaya-attendance-pro.git
+git push -u origin main
+```
+
+## Step 2: Deploy Frontend to Vercel
+
+1. Go to [vercel.com](https://vercel.com)
+2. Sign up with GitHub
+3. Click "New Project"
+4. Select `sahrdaya-attendance-pro` repository
+5. Configure:
+   - **Framework**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+6. Add Environment Variable:
+   - Name: `REACT_APP_API_URL`
+   - Value: `https://sahrdaya-api.railway.app/api` (you'll update this after backend deployment)
+7. Click "Deploy"
+
+Your frontend will be available at: `https://sahrdaya-attendance-pro.vercel.app`
+
+## Step 3: Deploy Backend to Railway
+
+1. Go to [railway.app](https://railway.app)
+2. Sign up with GitHub
+3. Click "Create New Project" → "Deploy from GitHub repo"
+4. Select `sahrdaya-attendance-pro`
+5. Configure:
+   - **Root Directory**: `backend`
+   - **Start Command**: `node server.js`
+   - **Node Version**: 18
+6. Add Environment Variables:
+   - `PORT`: `3001` (Railway will assign automatically)
+7. Click "Deploy"
+
+Your backend will get a URL like: `https://sahrdaya-api.railway.app`
+
+## Step 4: Update Frontend with Backend URL
+
+After Railway deploys the backend:
+
+1. Go back to Vercel project settings
+2. Go to "Environment Variables"
+3. Update `REACT_APP_API_URL` to your Railway backend URL (e.g., `https://sahrdaya-api.railway.app/api`)
+4. Redeploy from Vercel dashboard
+
+## Step 5: Test
+
+Open `https://sahrdaya-attendance-pro.vercel.app` on your phone/computer
+
+---
+
+## Quick Summary
+
+| Component | Host | URL |
+|-----------|------|-----|
+| Frontend (React) | Vercel | `sahrdaya-attendance-pro.vercel.app` |
+| Backend (Express) | Railway | `sahrdaya-api.railway.app` |
+| Database | Railway (SQLite) | Automatic |
+
+Both services have **free tier** - perfect for development and testing! 🎉
+>>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)

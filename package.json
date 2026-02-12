@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "",
+=======
+  "name": "sahrdaya-attendance-pro",
+>>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,10 +13,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "react-dom": "^19.2.3",
     "@google/genai": "^1.35.0",
     "react": "^19.2.3",
     "react-router-dom": "^7.12.0"
+=======
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "lucide-react": "^0.563.0",
+    "react-router-dom": "^7.13.0",
+    "recharts": "^3.7.0"
+>>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

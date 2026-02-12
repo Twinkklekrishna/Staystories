@@ -1,6 +1,12 @@
 
 {
+<<<<<<< HEAD
   "requestFramePermissions": [
     "geolocation"
   ]
+=======
+  "name": "Sahrdaya Attendance Pro",
+  "description": "A comprehensive mobile-first attendance management system for Sahrdaya College of Engineering and Technology, featuring subject locking, admin overrides, and real-time statistics.",
+  "requestFramePermissions": []
+>>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)
 }

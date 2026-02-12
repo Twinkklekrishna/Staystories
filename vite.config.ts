@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+<<<<<<< HEAD
         proxy: {
           // Proxy local /api requests to backend during development
           '/api': {
@@ -16,6 +17,8 @@ export default defineConfig(({ mode }) => {
             secure: false,
           }
         }
+=======
+>>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)
       },
       plugins: [react()],
       define: {

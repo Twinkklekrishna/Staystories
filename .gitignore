@@ -11,7 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+<<<<<<< HEAD
 .env
+=======
+>>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)
 
 # Editor directories and files
 .vscode/*
