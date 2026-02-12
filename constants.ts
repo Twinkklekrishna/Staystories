@@ -56,11 +56,16 @@ const generateStudents = (): Student[] => {
       for (let i = 1; i <= 65; i++) {
         const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
         const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        const gender = Math.random() > 0.5 ? 'M' : 'F';
         const studentId = `Y${year}${div}${i.toString().padStart(2, '0')}`;
+        
+        // Determine gender deterministically from student ID for consistent photo/gender matching
+        const idNumeric = parseInt(studentId.replace(/\D/g, ''));
+        const gender = (idNumeric % 2 === 0) ? 'M' : 'F';
+        
         // Use realistic stock photos from randomuser.me
         const genderPath = gender === 'M' ? 'men' : 'women';
-        const photoIndex = (parseInt(studentId.replace(/\D/g, '')) % 70) + 1;
+        const photoIndex = (idNumeric % 70) + 1;
+        
         students.push({
           id: studentId,
           rollNo: `CS${year}${div}${i.toString().padStart(2, '0')}`,
