@@ -7,9 +7,10 @@ import { STUDENTS, SUBJECTS } from '../constants';
 
 interface Props {
   attendance: AttendanceRecord[];
+  onSelectStudent?: (studentId: string) => void;
 }
 
-const StatsView: React.FC<Props> = ({ attendance }) => {
+const StatsView: React.FC<Props> = ({ attendance, onSelectStudent }) => {
   const [year, setYear] = useState<Year>(1);
   const [division, setDivision] = useState<Division>('A');
   const [searchTerm, setSearchTerm] = useState('');
@@ -100,7 +101,11 @@ const StatsView: React.FC<Props> = ({ attendance }) => {
 
         <div className="grid grid-cols-1 gap-3">
           {filteredStats.map(student => (
-            <div key={student.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+            <button
+              key={student.id}
+              onClick={() => onSelectStudent?.(student.id)}
+              className="text-left bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all flex items-center justify-between cursor-pointer"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs">
                   {student.orderIndex}
@@ -113,7 +118,7 @@ const StatsView: React.FC<Props> = ({ attendance }) => {
               <div className={`px-3 py-1.5 rounded-xl border text-sm font-black ${student.color}`}>
                 {student.percentage.toFixed(0)}%
               </div>
-            </div>
+            </button>
           ))}
           {filteredStats.length === 0 && (
             <div className="py-10 text-center text-slate-400">

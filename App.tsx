@@ -807,6 +807,7 @@ import { AttendanceRecord, LockState, Year, Division, Subject } from './types';
 import AttendanceView from './components/AttendanceView';
 import StatsView from './components/StatsView';
 import AdminView from './components/AdminView';
+import StudentDetailsView from './components/StudentDetailsView';
 import { generateMockAttendance } from './mockData';
 import { apiService } from './apiService';
 
@@ -839,6 +840,7 @@ const App: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [useBackend, setUseBackend] = useState(true);
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
 
   // Load initial data from backend or use mock data
   useEffect(() => {
@@ -984,10 +986,16 @@ const App: React.FC = () => {
                 <p className="text-xs text-slate-400 mt-1">{useBackend ? 'Using Backend' : 'Using Local Storage'}</p>
               </div>
             </div>
+          ) : selectedStudent ? (
+            <StudentDetailsView 
+              studentId={selectedStudent} 
+              attendance={attendance}
+              onBack={() => setSelectedStudent(null)}
+            />
           ) : (
             <Routes>
               <Route path="/" element={<AttendanceView attendance={attendance} locks={locks} onSave={saveAttendance} isAdmin={isAdmin} />} />
-              <Route path="/stats" element={<StatsView attendance={attendance} />} />
+              <Route path="/stats" element={<StatsView attendance={attendance} onSelectStudent={setSelectedStudent} />} />
               <Route path="/admin" element={<AdminView 
                 isAdmin={isAdmin} 
                 onLogin={handleAdminLogin} 
