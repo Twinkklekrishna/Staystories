@@ -46,6 +46,7 @@ export interface Memory {
 =======
 export type Year = 1 | 2 | 3 | 4;
 export type Division = 'A' | 'B' | 'C' | 'D';
+export type Gender = 'M' | 'F';
 
 export interface Subject {
   id: string;
@@ -60,6 +61,7 @@ export interface Student {
   name: string;
   year: Year;
   division: Division;
+  gender?: Gender;
 }
 
 export interface AttendanceRecord {

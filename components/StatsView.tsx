@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import { Search, Filter, TrendingUp, Info } from 'lucide-react';
 import { AttendanceRecord, Year, Division } from '../types';
 import { STUDENTS, SUBJECTS } from '../constants';
+import { StudentAvatar } from '../utils/avatarUtils';
 
 interface Props {
   attendance: AttendanceRecord[];
@@ -107,9 +108,7 @@ const StatsView: React.FC<Props> = ({ attendance, onSelectStudent }) => {
               className="text-left bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all flex items-center justify-between cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs">
-                  {student.orderIndex}
-                </div>
+                <StudentAvatar name={student.name} gender={student.gender} size="md" />
                 <div>
                   <p className="font-bold text-slate-800 text-sm">{student.name}</p>
                   <p className="text-[10px] text-slate-400 uppercase font-medium">{student.rollNo}</p>

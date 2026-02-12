@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ChevronLeft, Mail, Phone, MapPin, User, BookOpen, Calendar, AlertCircle } from 'lucide-react';
 import { AttendanceRecord, Student } from '../types';
 import { SUBJECTS, STUDENTS } from '../constants';
+import { StudentAvatar } from '../utils/avatarUtils';
 
 interface Props {
   studentId: string;
@@ -82,13 +83,11 @@ const StudentDetailsView: React.FC<Props> = ({ studentId, attendance, onBack }) 
       {/* Student Info Card */}
       <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 text-white p-6 rounded-3xl shadow-xl space-y-4">
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-1">
             <h2 className="text-3xl font-black">{student.name}</h2>
             <p className="text-indigo-100 font-semibold">Year {student.year} - Division {student.division}</p>
           </div>
-          <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
-            <User className="w-8 h-8" />
-          </div>
+          <StudentAvatar name={student.name} gender={student.gender} size="lg" className="shadow-lg" />
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-4">
@@ -105,6 +104,14 @@ const StudentDetailsView: React.FC<Props> = ({ studentId, attendance, onBack }) 
 
       {/* Contact Info */}
       <div className="space-y-3">
+        <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <User className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+          <div>
+            <p className="text-[10px] text-slate-500 font-bold uppercase">Gender</p>
+            <p className="font-semibold text-slate-800">{student.gender === 'M' ? 'Male' : student.gender === 'F' ? 'Female' : 'N/A'}</p>
+          </div>
+        </div>
+
         <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
           <Mail className="w-5 h-5 text-indigo-600 flex-shrink-0" />
           <div>

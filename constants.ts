@@ -56,12 +56,14 @@ const generateStudents = (): Student[] => {
       for (let i = 1; i <= 65; i++) {
         const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
         const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
+        const gender = Math.random() > 0.5 ? 'M' : 'F';
         students.push({
           id: `Y${year}${div}${i.toString().padStart(2, '0')}`,
           rollNo: `CS${year}${div}${i.toString().padStart(2, '0')}`,
           name: `${fName} ${lName}`,
           year: year as Year,
-          division: div as Division
+          division: div as Division,
+          gender: gender as 'M' | 'F'
         });
       }
     });
