@@ -104,6 +104,20 @@ const AttendanceView: React.FC<Props> = ({ attendance, locks, onSave, isAdmin })
     return d.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }, [date]);
 
+  // Generate full week schedule
+  const weekSchedule = useMemo(() => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const schedules: { [key: string]: { period: number, subjectId: string, name: string, isLab: boolean }[] } = {};
+    
+    days.forEach((day, index) => {
+      schedules[day] = getScheduleForDay(index, selectedYear, selectedDivision);
+    });
+    
+    return { days, schedules };
+  }, [selectedYear, selectedDivision]);
+
+  const [showWeeklyTable, setShowWeeklyTable] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="bg-indigo-700 p-6 rounded-[2.5rem] shadow-2xl shadow-indigo-200 text-white space-y-4">
@@ -160,9 +174,60 @@ const AttendanceView: React.FC<Props> = ({ attendance, locks, onSave, isAdmin })
         </div>
       </div>
 
+      {/* Weekly Timetable Table */}
       <div className="space-y-3">
         <div className="flex justify-between items-center px-1">
-          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time Table Schedule</h3>
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weekly Timetable - Year {selectedYear} Division {selectedDivision}</h3>
+          <button
+            onClick={() => setShowWeeklyTable(!showWeeklyTable)}
+            className="text-[9px] font-black text-indigo-600 uppercase hover:text-indigo-700 transition-colors"
+          >
+            {showWeeklyTable ? 'Hide' : 'Show'} Table
+          </button>
+        </div>
+
+        {showWeeklyTable && (
+          <div className="overflow-x-auto bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <table className="w-full text-[11px]">
+              <thead>
+                <tr className="border-b border-slate-200 bg-gradient-to-r from-indigo-50 to-indigo-25">
+                  <th className="px-3 py-2.5 text-left font-black text-slate-700 uppercase tracking-widest sticky left-0 bg-indigo-50 w-16">Day</th>
+                  {[1, 2, 3, 4, 5, 6, 7].map(period => (
+                    <th key={period} className="px-2 py-2.5 text-center font-black text-slate-600 uppercase tracking-widest whitespace-nowrap">
+                      P{period}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {weekSchedule.days.map((day, dayIndex) => (
+                  <tr key={day} className={`border-b border-slate-100 ${dayIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50'} hover:bg-indigo-25 transition-colors`}>
+                    <td className="px-3 py-2.5 font-black text-slate-700 uppercase tracking-widest sticky left-0 bg-gradient-to-r from-indigo-50 to-transparent w-16">
+                      {day.substring(0, 3)}
+                    </td>
+                    {weekSchedule.schedules[day].map((subject, periodIndex) => (
+                      <td key={periodIndex} className="px-2 py-2.5 text-center">
+                        <div className={`py-1.5 px-1.5 rounded-lg text-[9px] font-black leading-tight transition-all ${
+                          subject.isLab 
+                            ? 'bg-amber-100 text-amber-700 border border-amber-200' 
+                            : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                        }`}>
+                          <div className="truncate">{subject.name}</div>
+                          {subject.isLab && <div className="text-[7px] uppercase tracking-tighter opacity-75">Lab</div>}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex justify-between items-center px-1">
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Today's Schedule (Period Details)</h3>
           {isDayLocked && <span className="text-[9px] font-black text-red-500 uppercase flex items-center gap-1 bg-red-50 px-2 py-0.5 rounded-full border border-red-100"><Lock className="w-2.5 h-2.5"/> Full Day Locked</span>}
         </div>
         
