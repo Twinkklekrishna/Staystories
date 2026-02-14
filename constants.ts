@@ -91,8 +91,13 @@ export const STUDENTS = generateStudents();
 export const ADMIN_PASSWORD = "sahrdaya123";
 
 /**
- * Generates a mock timetable for a specific batch based on day of week.
- * Labs are assigned once a week to the last 3 periods.
+ * CONFLICT-FREE TEACHER SCHEDULE
+ * Day-based separation ensures no teaching time conflicts
+ * Monday: Year 1 classes (P1-4)
+ * Tuesday: Year 2 classes (P1-7, with labs P5-7)
+ * Wednesday: Year 3 classes (P1-7, with labs P5-7)
+ * Thursday: Year 4 classes (P1-4)
+ * Friday: Year 1 makeup (P1-4)
  */
 export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) => {
   const yearSubjects = SUBJECTS.filter(s => s.year === year);
@@ -107,20 +112,14 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
     return arr.slice(n % l).concat(arr.slice(0, n % l));
   };
 
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const dayName = dayNames[dayIndex];
-
   const schedule: { period: number, subjectId: string, name: string, isLab: boolean }[] = [];
+  const divIndex = div.charCodeAt(0) - 'A'.charCodeAt(0); // 0=A, 1=B, 2=C, 3=D
 
-  const labDay = year; 
-  const isLabDay = dayIndex === labDay && lab;
-
-  if (isLabDay) {
-    const dailyPool = [coreTeacherSub, ...otherSubs];
-    const rotatedPool = rotate(dailyPool, dayIndex + (div.charCodeAt(0)));
-    
-    for (let i = 1; i <= 4; i++) {
-      const sub = rotatedPool[i-1] || yearSubjects[0];
+  // NO TEACHING: return other subjects only
+  const fillWithOtherSubjects = () => {
+    const rotatedPool = rotate(otherSubs, dayIndex + divIndex);
+    for (let i = 1; i <= 7; i++) {
+      const sub = rotatedPool[(i-1) % rotatedPool.length] || yearSubjects[0];
       schedule.push({ 
         period: i, 
         subjectId: sub.id, 
@@ -128,6 +127,43 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
         isLab: false 
       });
     }
+  };
+
+  // Check if it's a teaching day for this year
+  const isTeachingDay = (year === 1 && (dayIndex === 1 || dayIndex === 5)) || // Mon, Fri
+                        (year === 2 && dayIndex === 2) ||                      // Tue
+                        (year === 3 && dayIndex === 3) ||                      // Wed
+                        (year === 4 && dayIndex === 4);                        // Thu
+
+  if (!isTeachingDay) {
+    fillWithOtherSubjects();
+    return schedule;
+  }
+
+  // Get teacher period based on division
+  const teacherPeriod = divIndex + 1; // A=P1, B=P2, C=P3, D=P4
+
+  // Check for lab day
+  const isLabDay = (year === 2 && dayIndex === 2) || (year === 3 && dayIndex === 3);
+
+  if (isLabDay && lab) {
+    // Lab day: periods 1-4 teacher's regular subject, 5-7 lab for all divisions
+    for (let i = 1; i <= 4; i++) {
+      let sub;
+      if (i === teacherPeriod) {
+        sub = coreTeacherSub;
+      } else {
+        const otherIdx = (i - 1) % otherSubs.length;
+        sub = otherSubs[otherIdx] || yearSubjects[0];
+      }
+      schedule.push({ 
+        period: i, 
+        subjectId: sub.id, 
+        name: sub.name, 
+        isLab: false 
+      });
+    }
+    // Lab periods (all divisions share)
     for (let i = 5; i <= 7; i++) {
       schedule.push({ 
         period: i, 
@@ -137,11 +173,15 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
       });
     }
   } else {
-    const dailyPool = [coreTeacherSub, ...otherSubs];
-    const rotatedPool = rotate(dailyPool, dayIndex + (div.charCodeAt(0)));
-    
+    // Regular teaching day: teacher's subject at fixed period, others fill rest
     for (let i = 1; i <= 7; i++) {
-      const sub = rotatedPool[(i-1) % rotatedPool.length] || yearSubjects[0];
+      let sub;
+      if (i === teacherPeriod) {
+        sub = coreTeacherSub;
+      } else {
+        const otherIdx = (i - 1) % otherSubs.length;
+        sub = otherSubs[otherIdx] || yearSubjects[0];
+      }
       schedule.push({ 
         period: i, 
         subjectId: sub.id, 
