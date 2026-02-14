@@ -187,27 +187,39 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
   } else {
     // Regular teaching day: teacher's subject at fixed period, others fill rest
     for (let i = 1; i <= 7; i++) {
-      let sub;
-      if (i === teacherPeriod) {
-        // For Year 4, show both EDA and DAA at their teaching period
-        if (year === 4 && secondaryTeacherSub) {
-          // Create a combined entry - we'll use coreTeacherSub but note both subjects
-          sub = coreTeacherSub; // Use EDA as primary
-        } else {
-          sub = coreTeacherSub;
-        }
+      // For Year 4, add both EDA and DAA at their teaching period
+      if (year === 4 && i === teacherPeriod && secondaryTeacherSub) {
+        // Add EDA
+        schedule.push({ 
+          period: i, 
+          subjectId: coreTeacherSub.id, 
+          name: coreTeacherSub.name, 
+          isLab: false 
+        });
+        // Add DAA
+        schedule.push({ 
+          period: i, 
+          subjectId: secondaryTeacherSub.id, 
+          name: secondaryTeacherSub.name, 
+          isLab: false 
+        });
+      } else if (i === teacherPeriod) {
+        schedule.push({ 
+          period: i, 
+          subjectId: coreTeacherSub.id, 
+          name: coreTeacherSub.name, 
+          isLab: false 
+        });
       } else {
         const otherIdx = (i - 1) % otherSubs.length;
-        sub = otherSubs[otherIdx] || yearSubjects[0];
+        const sub = otherSubs[otherIdx] || yearSubjects[0];
+        schedule.push({ 
+          period: i, 
+          subjectId: sub.id, 
+          name: sub.name, 
+          isLab: false 
+        });
       }
-      schedule.push({ 
-        period: i, 
-        subjectId: sub.id, 
-        name: year === 4 && i === teacherPeriod && secondaryTeacherSub 
-          ? `${sub.name} & ${secondaryTeacherSub.name}` 
-          : sub.name, 
-        isLab: false 
-      });
     }
   }
 
