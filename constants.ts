@@ -129,8 +129,7 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
   // NO TEACHING: return other subjects only
   const fillWithOtherSubjects = () => {
     const rotatedPool = rotate(otherSubs, dayIndex + divIndex);
-    const maxPeriods = year === 4 ? 6 : 7; // Year 4 has only 6 other subjects
-    for (let i = 1; i <= maxPeriods; i++) {
+    for (let i = 1; i <= 7; i++) {
       const sub = rotatedPool[(i-1) % rotatedPool.length] || yearSubjects[0];
       schedule.push({ 
         period: i, 
@@ -186,8 +185,7 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
     }
   } else {
     // Regular teaching day: teacher's subject at fixed period, others fill rest
-    const maxPeriods = year === 4 ? 6 : 7; // Year 4 has only 6 periods
-    for (let i = 1; i <= maxPeriods; i++) {
+    for (let i = 1; i <= 7; i++) {
       // For Year 4, add both EDA and DAA at their teaching period
       if (year === 4 && i === teacherPeriod && secondaryTeacherSub) {
         // Add EDA
