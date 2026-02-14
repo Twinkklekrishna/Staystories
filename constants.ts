@@ -40,7 +40,6 @@ export const SUBJECTS: Subject[] = [
   { id: 'Y4_S5', name: 'Cyber Security', year: 4, isLab: false },
   { id: 'Y4_S6', name: 'Project Phase I', year: 4, isLab: false },
   { id: 'Y4_S7', name: 'Professional Ethics', year: 4, isLab: false },
-  { id: 'Y4_S8', name: 'Deep Learning', year: 4, isLab: false },
 ];
 
 const firstNames = ["Rahul", "Anjali", "Midhun", "Sruthi", "Abhijith", "Meera", "Vaisakh", "Sneha", "Kiran", "Arya", "Arjun", "Lakshmi", "Nithin", "Devika", "Rohit", "Gautham", "Sreejith", "Aparna", "Varun", "Parvathy"];
@@ -130,7 +129,8 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
   // NO TEACHING: return other subjects only
   const fillWithOtherSubjects = () => {
     const rotatedPool = rotate(otherSubs, dayIndex + divIndex);
-    for (let i = 1; i <= 7; i++) {
+    const maxPeriods = year === 4 ? 6 : 7; // Year 4 has only 6 other subjects
+    for (let i = 1; i <= maxPeriods; i++) {
       const sub = rotatedPool[(i-1) % rotatedPool.length] || yearSubjects[0];
       schedule.push({ 
         period: i, 
@@ -186,7 +186,8 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
     }
   } else {
     // Regular teaching day: teacher's subject at fixed period, others fill rest
-    for (let i = 1; i <= 7; i++) {
+    const maxPeriods = year === 4 ? 6 : 7; // Year 4 has only 6 periods
+    for (let i = 1; i <= maxPeriods; i++) {
       // For Year 4, add both EDA and DAA at their teaching period
       if (year === 4 && i === teacherPeriod && secondaryTeacherSub) {
         // Add EDA
