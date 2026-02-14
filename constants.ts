@@ -104,7 +104,19 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
   const teacherSubs = ['GT', 'ECON', 'DBMS', 'DBMS_LAB', 'OS', 'OS_LAB', 'EDA', 'DAA'];
   
   const lab = yearSubjects.find(s => s.isLab);
-  const coreTeacherSub = yearSubjects.find(s => teacherSubs.includes(s.id) && !s.isLab);
+  
+  // For Year 4, get both EDA and DAA
+  let coreTeacherSub: any;
+  let secondaryTeacherSub: any;
+  
+  if (year === 4) {
+    const year4TeacherSubs = yearSubjects.filter(s => teacherSubs.includes(s.id) && !s.isLab);
+    coreTeacherSub = year4TeacherSubs[0]; // EDA
+    secondaryTeacherSub = year4TeacherSubs[1]; // DAA
+  } else {
+    coreTeacherSub = yearSubjects.find(s => teacherSubs.includes(s.id) && !s.isLab);
+  }
+  
   const otherSubs = yearSubjects.filter(s => !teacherSubs.includes(s.id) && !s.isLab);
   
   const rotate = (arr: any[], n: number) => {
@@ -177,7 +189,13 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
     for (let i = 1; i <= 7; i++) {
       let sub;
       if (i === teacherPeriod) {
-        sub = coreTeacherSub;
+        // For Year 4, show both EDA and DAA at their teaching period
+        if (year === 4 && secondaryTeacherSub) {
+          // Create a combined entry - we'll use coreTeacherSub but note both subjects
+          sub = coreTeacherSub; // Use EDA as primary
+        } else {
+          sub = coreTeacherSub;
+        }
       } else {
         const otherIdx = (i - 1) % otherSubs.length;
         sub = otherSubs[otherIdx] || yearSubjects[0];
@@ -185,7 +203,9 @@ export const getScheduleForDay = (dayIndex: number, year: Year, div: Division) =
       schedule.push({ 
         period: i, 
         subjectId: sub.id, 
-        name: sub.name, 
+        name: year === 4 && i === teacherPeriod && secondaryTeacherSub 
+          ? `${sub.name} & ${secondaryTeacherSub.name}` 
+          : sub.name, 
         isLab: false 
       });
     }
