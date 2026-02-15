@@ -1,5 +1,7 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+// Helper to get today's date in yyyy-mm-dd
+const getToday = () => new Date().toISOString().split('T')[0];
 import { Lock, Unlock, ShieldCheck, LogOut, KeyRound, AlertCircle, Trash2, Calendar, Edit3, Check, X, Search, ChevronRight } from 'lucide-react';
 import { LockState, AttendanceRecord, Year, Division } from '../types';
 import { STUDENTS, SUBJECTS } from '../constants';
@@ -24,6 +26,56 @@ const AdminView: React.FC<Props> = ({ isAdmin, onLogin, onLogout, locks, attenda
   const [editDivision, setEditDivision] = useState<Division>('A');
   const [editingSession, setEditingSession] = useState<AttendanceRecord | null>(null);
   const [editPresentIds, setEditPresentIds] = useState<Set<string>>(new Set());
+
+  // Subject override state
+  const [overridePeriod, setOverridePeriod] = useState(1);
+  const [overrideSubject, setOverrideSubject] = useState('');
+  const [overrideStatus, setOverrideStatus] = useState<string | null>(null);
+  const [currentOverride, setCurrentOverride] = useState<string | null>(null);
+
+  // Fetch current override for today/class/period
+  useEffect(() => {
+    const fetchOverride = async () => {
+      const date = getToday();
+      const division = editDivision;
+      const period = overridePeriod;
+      try {
+        const res = await fetch(`/api/subject-override?date=${date}&division=${division}&period=${period}`);
+        const data = await res.json();
+        setCurrentOverride(data.subjectId || null);
+      } catch {
+        setCurrentOverride(null);
+      }
+    };
+    fetchOverride();
+  }, [editDivision, overridePeriod]);
+
+  // Save override handler
+  const handleSaveOverride = async () => {
+    const date = getToday();
+    const division = editDivision;
+    const period = overridePeriod;
+    const subjectId = overrideSubject;
+    if (!subjectId) {
+      setOverrideStatus('Please select a subject.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/subject-override', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, division, period, subjectId })
+      });
+      if (res.ok) {
+        setOverrideStatus('Override saved!');
+        setCurrentOverride(subjectId);
+      } else {
+        setOverrideStatus('Failed to save override.');
+      }
+    } catch {
+      setOverrideStatus('Failed to save override.');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +157,59 @@ const AdminView: React.FC<Props> = ({ isAdmin, onLogin, onLogout, locks, attenda
 
   return (
     <div className="space-y-8">
+      {/* Subject Override Section */}
+      <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="bg-indigo-100 p-2 rounded-xl">
+            <Edit3 className="w-4 h-4 text-indigo-600" />
+          </div>
+          <h3 className="font-black text-slate-800 text-sm uppercase tracking-widest">Today's Subject Override</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Division</p>
+            <select 
+              value={editDivision} 
+              onChange={e => setEditDivision(e.target.value as Division)}
+              className="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 font-bold outline-none text-sm"
+            >
+              {['A','B','C','D'].map(d => <option key={d} value={d}>Division {d}</option>)}
+            </select>
+          </div>
+          <div>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Period</p>
+            <select 
+              value={overridePeriod} 
+              onChange={e => setOverridePeriod(Number(e.target.value))}
+              className="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 font-bold outline-none text-sm"
+            >
+              {[1,2,3,4,5,6,7,8].map(p => <option key={p} value={p}>Period {p}</option>)}
+            </select>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject</p>
+            <select 
+              value={overrideSubject} 
+              onChange={e => setOverrideSubject(e.target.value)}
+              className="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 font-bold outline-none text-sm"
+            >
+              <option value="">Select Subject</option>
+              {SUBJECTS.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 mt-2">
+          <button 
+            onClick={handleSaveOverride}
+            className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 active:scale-95 shadow-lg shadow-indigo-100"
+          >
+            Save Override
+          </button>
+          {overrideStatus && <span className="text-xs text-slate-500">{overrideStatus}</span>}
+          {currentOverride && <span className="text-xs text-emerald-600">Current: {SUBJECTS.find(s => s.id === currentOverride)?.name || currentOverride}</span>}
+        </div>
+        <p className="text-[10px] text-slate-400 mt-1">This will only affect today's attendance for the selected class and period. The main timetable remains unchanged.</p>
+      </div>
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black text-slate-800">Admin Tools</h2>

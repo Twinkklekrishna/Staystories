@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { allAsync, getAsync, runAsync, db } from './database.js';
+import { setSubjectOverride, getSubjectOverride } from './database.js';
 
 const app = express();
 const PORT = 5000;
@@ -105,6 +106,36 @@ setTimeout(initializeMockData, 500);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend is running!' });
+});
+
+// Set subject override for today
+app.post('/api/subject-override', async (req, res) => {
+  try {
+    const { date, division, period, subjectId } = req.body;
+    if (!date || !division || !period || !subjectId) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    await setSubjectOverride(date, division, period, subjectId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error setting subject override:', error);
+    res.status(500).json({ error: 'Failed to set subject override' });
+  }
+});
+
+// Get subject override for today
+app.get('/api/subject-override', async (req, res) => {
+  try {
+    const { date, division, period } = req.query;
+    if (!date || !division || !period) {
+      return res.status(400).json({ error: 'Missing required query params' });
+    }
+    const result = await getSubjectOverride(date, division, period);
+    res.json({ subjectId: result?.subjectId || null });
+  } catch (error) {
+    console.error('Error getting subject override:', error);
+    res.status(500).json({ error: 'Failed to get subject override' });
+  }
 });
 
 // Get all attendance records

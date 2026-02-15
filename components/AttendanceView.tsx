@@ -32,9 +32,33 @@ const AttendanceView: React.FC<Props> = ({ attendance, locks, onSave, isAdmin })
       .sort((a, b) => a.name.localeCompare(b.name)),
   [selectedYear, selectedDivision]);
 
-  const activeSubject = useMemo(() => 
-    schedule.find(s => s.period === selectedPeriod),
-  [schedule, selectedPeriod]);
+  // Subject override state
+  const [overrideSubjectId, setOverrideSubjectId] = useState<string | null>(null);
+
+  // Fetch subject override for selected date/division/period
+  useEffect(() => {
+    const fetchOverride = async () => {
+      if (!selectedPeriod) { setOverrideSubjectId(null); return; }
+      try {
+        const res = await fetch(`/api/subject-override?date=${date}&division=${selectedDivision}&period=${selectedPeriod}`);
+        const data = await res.json();
+        setOverrideSubjectId(data.subjectId || null);
+      } catch {
+        setOverrideSubjectId(null);
+      }
+    };
+    fetchOverride();
+  }, [date, selectedDivision, selectedPeriod]);
+
+  // Use override subject if present
+  const activeSubject = useMemo(() => {
+    if (!selectedPeriod) return undefined;
+    if (overrideSubjectId) {
+      const subj = SUBJECTS.find(s => s.id === overrideSubjectId);
+      return subj ? { ...subj, period: selectedPeriod, subjectId: overrideSubjectId } : undefined;
+    }
+    return schedule.find(s => s.period === selectedPeriod);
+  }, [schedule, selectedPeriod, overrideSubjectId]);
 
   const currentRecord = useMemo(() => {
     if (!activeSubject) return null;
@@ -85,15 +109,16 @@ const AttendanceView: React.FC<Props> = ({ attendance, locks, onSave, isAdmin })
       presentStudentIds: Array.from(presentIds),
       period: activeSubject.period
     });
-    
-    alert(`Attendance for Period ${selectedPeriod} saved. It is now locked.`);
+    alert(`Attendance for Period ${selectedPeriod} (${activeSubject.name}) saved. It is now locked.`);
     setSelectedPeriod(null);
   };
 
   const isPeriodMarked = (s: { subjectId: string, period: number, isLab: boolean }) => {
+    // If override exists for this period, check for attendance with override subjectId
+    const subjId = (overrideSubjectId && s.period === selectedPeriod) ? overrideSubjectId : s.subjectId;
     return attendance.some(r => 
       r.date === date && 
-      r.subjectId === s.subjectId && 
+      r.subjectId === subjId && 
       r.period === s.period &&
       r.division === selectedDivision
     );
@@ -282,7 +307,7 @@ const AttendanceView: React.FC<Props> = ({ attendance, locks, onSave, isAdmin })
                 <span className={`text-[10px] px-2 py-0.5 rounded-lg font-black uppercase ${activeSubject.isLab ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}`}>
                   Period {selectedPeriod}
                 </span>
-                <h3 className="font-black text-slate-800 text-lg">{activeSubject.name}</h3>
+                <h3 className="font-black text-slate-800 text-lg">{activeSubject.name} {overrideSubjectId && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-lg ml-2">Override</span>}</h3>
               </div>
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
                 {presentIds.size} Students Present / {filteredStudents.length} Total

@@ -41,6 +41,19 @@ export const initializeDatabase = () => {
       )
     `);
 
+    // Subject overrides table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS subject_overrides (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        division TEXT NOT NULL,
+        period INTEGER NOT NULL,
+        subjectId TEXT NOT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(date, division, period)
+      )
+    `);
+
     console.log('Database tables initialized');
   });
 };
@@ -53,6 +66,22 @@ export const runAsync = (query, params = []) => {
       else resolve({ id: this.lastID, changes: this.changes });
     });
   });
+};
+
+// Set subject override for a specific date, division, and period
+export const setSubjectOverride = async (date, division, period, subjectId) => {
+  return runAsync(
+    `INSERT OR REPLACE INTO subject_overrides (date, division, period, subjectId) VALUES (?, ?, ?, ?)`,
+    [date, division, period, subjectId]
+  );
+};
+
+// Get subject override for a specific date, division, and period
+export const getSubjectOverride = async (date, division, period) => {
+  return getAsync(
+    `SELECT subjectId FROM subject_overrides WHERE date = ? AND division = ? AND period = ?`,
+    [date, division, period]
+  );
 };
 
 export const getAsync = (query, params = []) => {
