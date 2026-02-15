@@ -9,14 +9,11 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "skipLibCheck": true,
-<<<<<<< HEAD
-=======
-    "types": [
-      "node"
-    ],
->>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)
-    "moduleResolution": "bundler",
+"skipLibCheck": true,
+"types": [
+  "node"
+],
+"moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
@@ -28,12 +25,5 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-<<<<<<< HEAD
-  },
-  "exclude": [
-    "server"
-  ]
-=======
   }
->>>>>>> ac92b0f (Initial commit - Sahrdaya Attendance App)
 }
